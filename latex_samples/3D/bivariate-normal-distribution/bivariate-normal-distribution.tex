@@ -1,0 +1,86 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.8}
+\begin{comment}
+:Title: Bivariate normal distribution
+:Tags: 3D;Surface plots;Mathematics
+:Author: Jake
+:Slug: bivariate-normal-distribution
+
+We would like to draw a bivariate normal distribution and show where the
+means from the two variables meet in the space.
+
+There are a couple of things in the code that might be useful:
+
+You can define mathematical functions using
+declare  function={<name>(<argument macros>)=<function>;},
+which will help to keep the code clean and avoid repetitions.
+
+You can define a new colormap using
+\pgfplotsset{colormap={<name>}{<color model>(<distance>)=(<value1>);
+<color model>(<distance 2>)=(<value2>)} }. This is a very powerful feature,
+so definitely worth reading in the pgfplots manual.
+
+The legend created by colorbar is a whole new plot,
+so you can configure it with all the usual axis options.
+
+There are different ways for defining 3D functions:
+\addplot3 {<function>};
+will evaluate <function> at every point on a grid and assume
+the result to be a z-value.
+\addplot3 ({<x>},{<y>},{<z>});
+defines a parametric function in 3D space, which allows you to draw
+three-dimensional lines, among other things.
+
+This code was written by Jake on TeX.SE.
+\end{comment}
+\pgfplotsset{%
+  colormap={whitered}{color(0cm)=(white);
+  color(1cm)=(orange!75!red)}
+}
+\begin{document}
+\begin{tikzpicture}[
+  declare function = {mu1=1;},
+  declare function = {mu2=2;},
+  declare function = {sigma1=0.5;},
+  declare function = {sigma2=1;},
+  declare function = {normal(\m,\s)=1/(2*\s*sqrt(pi))*exp(-(x-\m)^2/(2*\s^2));},
+  declare function = {bivar(\ma,\sa,\mb,\sb)=
+    1/(2*pi*\sa*\sb) * exp(-((x-\ma)^2/\sa^2 + (y-\mb)^2/\sb^2))/2;}]
+  \begin{axis}[
+    colormap name  = whitered,
+    width          = 15cm,
+    view           = {45}{65},
+    enlargelimits  = false,
+    grid           = major,
+    domain         = -1:4,
+    y domain       = -1:4,
+    samples        = 26,
+    xlabel         = $x_1$,
+    ylabel         = $x_2$,
+    zlabel         = {$P$},
+    colorbar,
+    colorbar style = {
+      at     = {(1,0)},
+      anchor = south west,
+      height = 0.25*\pgfkeysvalueof{/pgfplots/parent axis height},
+      title  = {$P(x_1,x_2)$}
+    }
+  ]
+    \addplot3 [surf] {bivar(mu1,sigma1,mu2,sigma2)};
+    \addplot3 [domain=-1:4,samples=31, samples y=0, thick, smooth]
+      (x,4,{normal(mu1,sigma1)});
+    \addplot3 [domain=-1:4,samples=31, samples y=0, thick, smooth]
+      (-1,x,{normal(mu2,sigma2)});
+
+    \draw [black!50] (axis cs:-1,0,0) -- (axis cs:4,0,0);
+    \draw [black!50] (axis cs:0,-1,0) -- (axis cs:0,4,0);
+
+    \node at (axis cs:-1,1,0.18) [pin=165:$P(x_1)$] {};
+    \node at (axis cs:1.5,4,0.32) [pin=-15:$P(x_2)$] {};
+  \end{axis}
+\end{tikzpicture}
+\end{document}

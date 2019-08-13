@@ -1,0 +1,136 @@
+% This is a 'standalone' plot, so uses the standalone class
+\documentclass{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\begin{comment}
+:Title: Cyclic voltammetry
+:Tags: 2D;Styles;Tufte;Chemistry
+:Author: Joseph Wright
+:Slug: cyclic-voltammetry
+
+Visualization of chemical experiment data with Tufte style axes.
+\end{comment}
+% Making plots, so load the pgfplots package of course!
+\usepackage{pgfplots}
+
+% A bit of font set-up: use Latin Modern and T1 encoding
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% For typesetting units
+\usepackage{siunitx}
+
+% For chemical information
+\usepackage{chemformula}
+
+% Use the latest settings, so we don't get trapped with old bugs or
+% limited features.
+\pgfplotsset{compat = newest}
+
+% A few changes to how legends look: this is done for all plots.
+\pgfplotsset{
+  every axis legend/.append style =
+    {
+      % Change the text alignment so the end of the text (rather than the
+      % start) lines up.
+      cells = { anchor = east },
+      % The standard pgfplots settings use a box around legends:
+      % I prefer without this.
+      draw  = none
+    }
+}
+
+% Create a style to allow control of the settings: this will allow
+% several plots to share the same setting without copy-pasting
+\pgfplotsset{
+  cyclic voltammetry/.style =
+    {
+      % Using a cycle list just altering colour means that there are no
+      % marks: that is normal for this sort of plot.
+      cycle list name = color list , 
+      % Ensure that the x-axis values always have the same number of 
+      % decimal places, to avoid e.g. "1" but "1.2".
+      every x tick label/.append style  =
+        { 
+          /pgf/number format/.cd ,
+           precision = 1 , 
+           fixed         ,
+           zerofill
+        },
+      % The labels apply to all plots of this type.
+      % Notice that in this case the zero is ferrocenium/ferrocene, but that
+      % will depend on the experiment.
+      xlabel = $E / \si{\volt} \textrm{ \emph{versus} } \ch{Fc+}/\ch{Fc}$,
+      % The normalised y-axis has something of a nightmare label!
+      ylabel =
+        $
+          ( i / \si{\micro\ampere} )
+            / \sqrt{\nu / ( \si{\milli\volt\per\second} ) }
+        $,
+    },
+}
+
+% Not everyone likes the 'axis box' effect which is the pgfplots default.
+% Here, we'll set up to use 'Tufte-like' settings: see
+% https://www.tug.org/members/TUGboat/tb34-2/tb107dugge.pdf for more on
+% this.
+\makeatletter
+\pgfplotsset{
+  tufte axes/.style =
+    {
+      after end axis/.code =
+        {
+          \draw ({rel axis cs:0,0} -| {axis cs:\pgfplots@data@xmin,0})
+            -- ({rel axis cs:0,0}  -| {axis cs:\pgfplots@data@xmax,0});
+          \draw ({rel axis cs:0,0} |- {axis cs:0,\pgfplots@data@ymin})
+            -- ({rel axis cs:0,0}  |-{axis cs:0,\pgfplots@data@ymax});
+        },
+      axis line style = {draw = none},
+      tick align      = outside,
+      tick pos        = left
+    }
+}
+\makeatother
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}%
+    [
+      % Choose the general settings
+      cyclic voltammetry,
+      % and the Tufte style
+      tufte axes,
+      % Place the legend 'out of the way': this needs a bit of
+      % experimentation!
+      every axis legend/.append style = {at = {(0.9,0.5)}}
+    ]
+    % Loop for each scan rate
+    \foreach \datafile in {50,500}
+      {
+        % For each case, add a plot
+        \addplot
+          table
+            [
+              % This plot extracts data directly from the instrument files.
+              % To do that, we skip the first couple of lines.
+              skip first n = 2 ,
+              % The x-axis has a correction for the zero: that is done using
+              % a simple expression
+              x expr       = \thisrowno{0} + 0.412,
+              % The y-axis is more complicated! There is a scaling so the
+              % currents are in microamperes, and also a division by the
+              % scan rate. The data files themselves are named using the
+              % scan rate in millivolts per second: that is converted to 
+              % volts per second before doing the square root.
+              y expr       = 
+                ( 1000000 * \thisrowno{1} )
+                  / sqrt ( \datafile  / 1000 )
+            ]
+          from {\datafile.ocw}; 
+        % Add a legend entry: the \datafile has to be forced to expand!  
+        \addlegendentryexpanded{\SI{\datafile}{\milli\volt\per\second}};
+      };  
+  \end{axis}
+\end{tikzpicture}
+\end{document}

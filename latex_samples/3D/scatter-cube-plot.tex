@@ -1,0 +1,203 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+\begin{filecontents}{pgfplots_scatterdata4.dat}
+l_0	l_1	l_2	
+1	6	-1	
+-1	-1	-1	
+0	-1	-1	
+-1	0	-1	
+-1	-1	0	
+1	-1	-1	
+0	0	-1	
+0	-1	0	
+1	-1	6	
+-1	1	-1	
+-1	0	0	
+0	7	-1	
+-1	-1	1	
+2	-1	-1	
+1	0	-1	
+1	-1	0	
+0	1	-1	
+0	-1	1	
+0	-1	7	
+-1	2	-1	
+-1	1	0	
+-1	8	-1	
+-1	0	1	
+-1	-1	2	
+3	-1	-1	
+2	0	-1	
+2	-1	0	
+1	1	-1	
+1	-1	1	
+0	2	-1	
+8	0	-1	
+0	-1	2	
+-1	3	-1	
+7	1	-1	
+-1	2	0	
+-1	1	1	
+7	-1	1	
+-1	0	2	
+6	2	-1	
+-1	-1	3	
+4	-1	-1	
+6	-1	2	
+3	0	-1	
+3	-1	0	
+5	3	-1	
+2	1	-1	
+2	-1	1	
+5	-1	3	
+1	2	-1	
+4	4	-1	
+1	-1	2	
+0	3	-1	
+4	-1	4	
+3	5	-1	
+0	-1	3	
+-1	4	-1	
+-1	3	0	
+-1	2	1	
+-1	1	2	
+3	-1	5	
+-1	0	3	
+-1	-1	4	
+2	6	-1	
+5	-1	-1	
+4	0	-1	
+4	-1	0	
+3	1	-1	
+3	-1	1	
+2	-1	6	
+2	2	-1	
+1	7	-1	
+2	-1	2	
+1	3	-1	
+1	-1	3	
+1	-1	7	
+0	4	-1	
+0	8	-1	
+0	-1	4	
+-1	5	-1	
+-1	4	0	
+-1	3	1	
+-1	2	2	
+-1	1	3	
+-1	0	4	
+-1	-1	5	
+6	-1	-1	
+5	0	-1	
+5	-1	0	
+4	1	-1	
+4	-1	1	
+3	2	-1	
+3	-1	2	
+2	3	-1	
+8	1	-1	
+2	-1	3	
+1	4	-1	
+7	2	-1	
+6	3	-1	
+1	-1	4	
+0	5	-1	
+5	4	-1	
+0	-1	5	
+-1	6	-1	
+-1	4	1	
+4	5	-1	
+-1	3	2	
+-1	2	3	
+-1	1	4	
+-1	-1	6	
+7	-1	-1	
+3	6	-1	
+6	0	-1	
+6	-1	0	
+5	1	-1	
+5	-1	1	
+4	2	-1	
+4	-1	2	
+2	7	-1	
+3	3	-1	
+3	-1	3	
+2	4	-1	
+1	8	-1	
+2	-1	4	
+1	5	-1	
+1	-1	5	
+0	6	-1	
+0	-1	6	
+-1	7	-1	
+-1	-1	7	
+8	-1	-1	
+7	0	-1	
+7	-1	0	
+6	1	-1	
+6	-1	1	
+5	2	-1	
+5	-1	2	
+4	3	-1	
+4	-1	3	
+3	4	-1	
+3	-1	4	
+2	5	-1	
+2	-1	5	
+# vi: tabstop=20 nowrap nostartofline
+\end{filecontents}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.8}
+\begin{comment}
+:Title: Scatter plot with cubes
+:Tags: 3D;Scatter plots;Manual
+:Author: Christian Feuersänger
+:Slug: scatter-cube-plot
+
+This scatter plot example uses mark=cube* and z buffer=sort to place boxes
+at each input coordinate. The color for each box is determined by point
+meta={x+y+3}. The remaining keys are just for pretty printing.
+
+The code is from the PGFPlots 1.10 manual: "4.6.4 Scatter Plots",
+"Stacked Bar Plots and Nodes Near Coords".
+\end{comment}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+	view={120}{40},
+	width=220pt,
+	height=220pt,
+	grid=major,
+	z buffer=sort,
+	xmin=-1,xmax=9,
+	ymin=-1,ymax=9,
+	zmin=-1,zmax=9,
+	enlargelimits=upper,
+	xtick={-1,1,...,19},
+	ytick={-1,1,...,19},
+	ztick={-1,1,...,19},
+	xlabel={$l_1$},
+	ylabel={$l_2$},
+	zlabel={$l_3$},
+	point meta={x+y+z+3},
+	colormap={summap}{
+		color=(black); color=(blue); 
+		color=(black); color=(white) 
+		color=(orange) color=(violet) 
+		color=(red)
+	},
+	scatter/use mapped color={
+		draw=mapped color,fill=mapped color!70},
+	]
+	% `pgfplots_scatter4.dat' contains a large sequence of
+	% the form
+	% l_0   l_1     l_2     
+	% 1     6       -1      
+	% -1    -1      -1      
+	\addplot3[only marks,scatter,mark=cube*,mark size=7] 
+		table {pgfplots_scatterdata4.dat};
+\end{axis}
+\end{tikzpicture}
+\end{document}

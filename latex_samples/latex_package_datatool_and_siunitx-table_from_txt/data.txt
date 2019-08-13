@@ -1,0 +1,4 @@
+name,surname,age,IQ
+Albert,Einstein,133,210.12
+Marie,Curie,145,220.12
+

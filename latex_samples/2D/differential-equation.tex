@@ -1,0 +1,47 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.8}
+\usepackage{pgfplotstable}
+\begin{comment}
+:Title: Differential equation direction plot
+:Tags: 2D;PGFPlotstable;Mathematics
+:Author: Jake
+:Slug: differential-equation
+
+Using PGFPlotstable, we can use a naive numerical integration
+scheme to find the function directly within LaTeX.
+
+This code was written by Jake on TeX.SE.
+\end{comment}
+\pgfplotstableset{
+    create on use/x/.style={
+        create col/expr={
+            \pgfplotstablerow/201*2-1
+        }
+    },
+    create on use/y/.style={
+        create col/expr accum={
+            \pgfmathaccuma+(2/201)*(abs(\pgfmathaccuma^2)+abs(\thisrow{x}^2)-1)
+        }{0.6}
+    }
+}
+\pgfplotstablenew{201}\loadedtable
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+      view     = {0}{90},
+      domain   = -1:1,
+      y domain = -1:1,
+      samples  = 21,
+      xmax     = 1,
+      ymax     = 1
+    ]
+    \addplot3 [gray, quiver={u={1}, v={x^2+y^2-1}, scale arrows=0.075,
+               every arrow/.append style={-latex}}] (x,y,0);
+    \addplot [thick, red] table [x=x, y=y] {\loadedtable};
+  \end{axis}
+\end{tikzpicture}
+\end{document}

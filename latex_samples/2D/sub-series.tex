@@ -1,0 +1,48 @@
+\documentclass[border=5pt]{standalone}
+%%%<
+\usepackage{verbatim}
+\begin{filecontents}{serieA.dat}
+#subseries x y
+1 10 90
+2 20 80
+\end{filecontents}
+\begin{filecontents}{serieB.dat}
+#subseries x y
+1 70 30
+2 25 75
+\end{filecontents}
+%%%>
+\begin{comment}
+:Title: Sub series in stacked bar plot
+:Tags: 2D;Bar plots
+:Author: Elke Schubert
+:Slug: sub-series
+
+Two series will be shown in a bar plot. Additionally, they contain sub series,
+which we would like to plot in the same diagram. So we just need a 2D plot.
+We will shift the series to achieve that. 
+\end{comment}
+\usepackage{pgfplots}
+\pgfplotsset{compat = 1.8}
+\colorlet{xcolorA}{red!80!black}
+\colorlet{xcolorB}{orange}
+\colorlet{ycolorA}{blue}
+\colorlet{ycolorB}{blue!40!white}
+\begin{document}
+\begin{tikzpicture}
+  \pgfplotsset{ybar stacked, ymin=0, ymax=100, xmin=0.5, xmax=2.5, xtick=data}
+  \begin{axis}[bar shift=-8pt,
+    legend pos = outer north east, legend style = {name = serieA}]
+    \addplot [fill=xcolorA] table [x index = 0, y index = 1] {serieA.dat};
+    \addplot [fill=ycolorA] table [x index = 0, y index = 2] {serieA.dat};
+    \legend{x (Serie A), y (Serie A)}
+  \end{axis}
+  \begin{axis}[bar shift = 8pt,
+    legend style = {at = {([yshift = -1mm]serieA.south west)},
+      anchor = north west}]
+    \addplot [fill = xcolorB] table [x index = 0, y index = 1] {serieB.dat};
+    \addplot [fill = ycolorB] table [x index = 0, y index = 2] {serieB.dat};
+    \legend{x (Serie B), y (Serie B)}
+  \end{axis}
+\end{tikzpicture}
+\end{document}

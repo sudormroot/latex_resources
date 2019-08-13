@@ -1,0 +1,124 @@
+% This is a 'standalone' plot, so uses the standalone class
+\documentclass[border=5pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\begin{comment}
+:Title: Infrared data plot
+:Tags: 2D;Loops;Pins;Chemistry
+:Author: Joseph Wright
+:Slug: infrared
+
+This plot is a demonstration example. It bases on infrared data from a
+chemical experiment. Detailed explanation abut the plot setup is included.
+\end{comment}
+
+% A bit of font set-up: use Latin Modern and T1 encoding
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% For typesetting units
+\usepackage{siunitx}
+
+% Making plots, so load the pgfplots package of course!
+\usepackage{pgfplots}
+
+% Use the latest settings, so we don't get trapped with old bugs or
+% limited features.
+\pgfplotsset{compat = newest}
+% For fixing the compatibility level, so no change in future versions
+% you could set a version, such as \pgfplotsset{compat = 1.8}
+
+% A short list of colours which run from pure blue to pure red:
+% eleven steps which is about right for this typo of plot.
+\pgfplotscreateplotcyclelist{blue to red}{%
+  color=blue\\%
+  color=red!10!blue\\%
+  color=red!20!blue\\%
+  color=red!30!blue\\%
+  color=red!40!blue\\%
+  color=red!50!blue\\%
+  color=red!60!blue\\%
+  color=red!70!blue\\%
+  color=red!80!blue\\%
+  color=red!90!blue\\%
+  color=red\\%
+}
+
+% Turn off the default comma separator for larger numbers
+\pgfkeys{
+  /pgf/number format/set thousands separator =
+}
+
+% Create a couple of style to allow control of the settings.
+% First, create some very general settings for infra-red data.
+% Then, use that and additional settings to specify what happens
+% for a difference plot such as this one.
+\pgfplotsset{
+  infra-red/.style =
+    {
+      % Chemists always plot infra-red data with the x-axis 'backward'.
+      % Physicists work the other way: using a setting here makes it easy
+      % to flip things round.
+      x dir  = reverse,
+      % The labels apply to all plots of this type.
+      xlabel = $\tilde{\nu}/\si{\per\cm}$,
+      ylabel = $\mathrm{Milliabsorbance}$,
+    },
+  infra-red difference/.style =
+    {
+      % The settings here inherit from the more general infra-red plot.
+      infra-red,
+      % Use the 'controlled' colour change.
+      cycle list name     = blue to red,
+      % For difference plots, a line showing the zero is useful. This
+      % is done by making an additinal grid line.
+      extra y ticks       = 0,
+      extra y tick labels = \empty,
+      extra y tick style  = { grid = major },
+      % Since this is a difference, the y-axis needs a modified label.
+      ylabel              = $\Delta \mathrm{Milliabsorbance}$,
+    }
+}
+
+% Not everyone likes the 'axis box' effect, which can be turned off by
+% uncommenting these two lines. As such a change should (probably) apply to all
+% of the plots in a document, this is not tied to a particular plot style.
+\pgfplotsset{
+%  axis x line* = bottom ,
+%  axis y line* = left
+}
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}%
+    [
+      % Choose the general settings
+      infra-red difference,
+      % Specify the x range
+      xmax = 2100,
+      xmin = 1800,
+      % Set the maximum y value: this is needed for the labels that will be
+      % added below.
+      ymax = 3
+    ]
+    % Use a \foreach to seleect data from the raw experimental data:
+    % this makes it easy to plot only some of the lines.
+    \foreach \yindex in {2,3,...,11}
+      \addplot table[y index = \yindex] {\jobname.txt};
+    % Adding labels to the peaks: as the text and the horizontal positions
+    % are the same, this can be automated. Notice that \foreach does not
+    % work here!
+    \pgfplotsinvokeforeach{1900,1948,1989,2031}%
+      {
+        % Each label is done as a 'pin' with the text rotated so it is 
+        % vertical. The height has to be set by hand (it's "1.3" here), and
+        % to make sure the labels actually show up the ymax key was set
+        % earlier, again using hand adjustment.
+        \node[coordinate, pin = {[rotate=90]right:#1}] at 
+          (axis cs:#1,1.3) { };
+      }  
+  \end{axis}
+\end{tikzpicture}
+\end{document}

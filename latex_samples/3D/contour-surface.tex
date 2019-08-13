@@ -1,0 +1,91 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.8}
+\usepackage{amsmath}
+\begin{comment}
+:Title: Contour on a surface
+:Tags: 2D;PGFPlotstable;Styles
+:Author: Jake
+:Slug: contour-surface
+
+We will combine surface and contour plots. We would like the contour lines
+drawn on the surface to be hidden by the surface in the foreground but not
+in the background, like looking into such a "valley".
+
+It is very difficult with the current version of pgfplots. The simple reason
+is that z-buffering is not fully implemented.
+
+We can do our own z-buffering (which can be quite cumbersome). This means
+that you have to draw the parts in terms of their appearance on the screen,
+and thus a lot of double drawings.
+
+To run this example for the first time you have to do the following:
+
+- GNUPLOT must be installed on your system. Try typing ``gnuplot`` on the
+  command line to see if it's installed. Windows users may have to
+  rename ``wgnuplot`` to ``gnuplot``.
+- You must allow TeX to run external programs. The command line option to
+  enable this is usually ``--shell-escape`` or ``--enable-write18``.
+
+PGF will call GNUPLOT for you and store the data in a file. Next time you
+compile the example, data will be loaded from the generated file. See
+section 11.12.3 in the manual for more information.
+
+This code was written by Jake and JJ Fleck on TeX.SE.
+\end{comment}
+\begin{document}
+\pgfplotsset{
+  compat=1.8,
+  colormap={whitered}{color(0cm)=(white); color(1cm)=(orange!75!red)}
+}
+
+\begin{tikzpicture}
+  \begin{axis}[
+    colormap name=whitered,
+    3d box,
+    width=15cm,
+    view={25}{25},
+    enlargelimits=false,
+    grid=major,
+    domain=-0.5:4.7,
+    y domain=-2:2,
+    samples=21,
+    xlabel=$x$,
+    ylabel=$\dot{x}$,
+    zlabel={$\text{E}_{\text{m}}$},
+    colorbar,
+    colorbar style={
+        at={(1,0)},
+        anchor=south west,
+        height=0.1*\pgfkeysvalueof{/pgfplots/parent axis height},
+        title={$\text{E}_{\text{m}}(x,\dot{x})$}
+        }
+    ]
+    \addplot3 [y domain = 0:2, surf]
+      {-0.7+4*exp(-0.5*(x+3))*(3*cos(4*x*180/pi)+2.5*cos(2*x*180/pi))
+       + 0.5*y*y*4};
+
+    \addplot3 [y domain = 0:2, contour gnuplot = {number=14, labels={false},
+      draw color = black}, samples = 21, ]
+      {-0.7+4*exp(-0.5*(x+3))*(3*cos(4*x*180/pi)+2.5*cos(2*x*180/pi))
+       + 0.5*y*y*4};
+
+    \addplot3 [domain = -0.5:4.7, samples = 31, samples y = 0, thick, smooth]
+        (x,-2,{-0.6+4*exp(-0.5*(x+3))*(3*cos(4*x*180/pi)+2.5*cos(2*x*180/pi))});
+    \addplot3 [contour gnuplot = {number=14, labels={false}, draw color=black},
+        samples=21,z filter/.code={\def\pgfmathresult{20}}]
+        {-0.7+4*exp(-0.5*(x+3))*(3*cos(4*x*180/pi)+2.5*cos(2*x*180/pi))
+         + 0.5*y*y*4};
+    \addplot3 [y domain=-2:0,surf]
+        {-0.7+4*exp(-0.5*(x+3))*(3*cos(4*x*180/pi)+2.5*cos(2*x*180/pi))
+         + 0.5*y*y*4};
+    \addplot3 [domain = 0:.25, contour gnuplot = {number=14,labels={false},
+        draw color=black}, samples=21]
+        {-0.7+4*exp(-0.5*(x+3))*(3*cos(4*x*180/pi)+2.5*cos(2*x*180/pi))
+         + 0.5*y*y*4};
+  \end{axis}
+\end{tikzpicture}
+\end{document}

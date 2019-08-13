@@ -1,0 +1,41 @@
+\documentclass{article}
+
+\usepackage{datatool}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+ 
+ %% table design
+\colorlet{tableheadcolor}{black!60}
+\newcommand\tableheadfont{%
+  \sffamily\bfseries
+  \slshape
+  \color{white}
+}
+
+\begin{document}
+
+\DTLloaddb{table}{data.txt}
+
+
+\sisetup{round-mode=places,
+         table-number-alignment = center-decimal-marker
+         }
+
+\begin{tabular}{l
+                l
+                S[table-format = 3.0  ,round-precision=0]
+                S[table-format = 3.2  ,round-precision=2]
+                @{}l}
+    \rowcolor{tableheadcolor}
+    \tableheadfont name & \tableheadfont surname & \tableheadfont age & \tableheadfont the long iq  \\
+    \hline
+    \DTLforeach*{table}%
+    {\name=name, \surname=surname, \age=age, \iq=IQ}%
+    {\DTLiffirstrow{}{\tabularnewline}%
+     \name & \surname & \age & \iq &
+    }
+\end{tabular}
+
+\end{document}

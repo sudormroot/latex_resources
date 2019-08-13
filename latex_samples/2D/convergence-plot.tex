@@ -1,0 +1,110 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+\usepackage{filecontents}
+
+\begin{filecontents}{data_d2.dat}
+dof        l2_err     level
+5          8.312e-02  2
+17         2.547e-02  3
+49         7.407e-03  4
+129        2.102e-03  5
+321        5.874e-04  6
+769        1.623e-04  7
+1793       4.442e-05  8
+4097       1.207e-05  9
+9217       3.261e-06  10
+\end{filecontents}
+\begin{filecontents}{data_d3.dat}
+dof        l2_err     level
+7          8.472e-02  2
+31         3.044e-02  3
+111        1.022e-02  4
+351        3.303e-03  5
+1023       1.039e-03  6
+2815       3.196e-04  7
+7423       9.658e-05  8
+18943      2.873e-05  9
+47103      8.437e-06  10
+\end{filecontents}
+\begin{filecontents}{data_d4.dat}
+dof        l2_err     level
+9          7.881e-02  2
+49         3.243e-02  3
+209        1.232e-02  4
+769        4.454e-03  5
+2561       1.551e-03  6
+7937       5.236e-04  7
+23297      1.723e-04  8
+65537      5.545e-05  9
+178177     1.751e-05  10
+\end{filecontents}
+%%%>
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{width=7cm,compat=1.8}
+\begin{comment}
+:Title: Convergence Plot
+:Tags: PGFPlotstable;Mathematics;Manual
+:Author: Christian Feuersänger
+:Slug: convergence-plot
+
+We assume that we did some scientfic experiment.
+The scientific experiment yielded three
+input data tables: one table for each involved parameter
+d = 2, d = 3, d = 4. The data tables contain "degrees
+of freedom" and some accuracy measurement "l2_err". In addition,
+they might contain some meta-data
+(in our case a column "level").
+
+What we want is to produce three plots, each dof versus l2_err,
+in a loglog plot. We expect that
+the result is a line in a loglog plot, and we are interested in
+its slope log e(N) = -a log(N) because that
+characterizes our experiment.
+
+The code is from the PGFPlots 1.10 manual:
+"3.3 Solving a Real Use Case: Scientific Data Analysis".
+\end{comment}
+\begin{document}
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    title=Convergence Plot,
+    xlabel={Degrees of freedom},
+    ylabel={$L_2$ Error},
+    grid=major,
+    legend entries={$d=2$,$d=3$,$d=4$},
+]
+\addplot table {data_d2.dat};
+\addplot table {data_d3.dat};
+\addplot table {data_d4.dat};
+\addplot table[
+     x=dof,
+     y={create col/linear regression={y=l2_err,
+      variance list={1000,800,600,500,400,200,100}}}]
+   {data_d4.dat}
+   % save two points on the regression line
+   % for drawing the slope triangle
+   coordinate [pos=0.25] (A)
+   coordinate [pos=0.4]  (B)
+   ;
+% save the slope parameter:
+\xdef\slope{\pgfplotstableregressiona}
+
+% draw the opposite and adjacent sides
+% of the triangle
+\draw (A) -| (B)
+     node [pos=0.75,anchor=west]
+         {\pgfmathprintnumber{\slope}};
+\end{loglogaxis}
+\begin{loglogaxis}[
+        footnotesize,
+        clip=false,
+        xshift=7cm,
+]
+\addplot table {data_d2.dat}
+   node [pos=1,pin=0:Special.] {}
+   ;
+\end{loglogaxis}
+\end{tikzpicture}
+\end{document}

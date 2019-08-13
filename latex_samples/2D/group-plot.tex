@@ -1,0 +1,63 @@
+\documentclass[margin=5mm]{standalone}
+%%%<
+\usepackage{verbatim}
+% Example data
+\usepackage{filecontents}
+\begin{filecontents*}{data.csv}
+  Number   Orders   Day
+  1   816   June\ 19
+  2   687   June\ 20
+  3   676   June\ 21
+  4   597   June\ 22
+  5   743   June\ 25
+  6   718   June\ 26
+  7   702   June\ 27
+  8   634   June\ 28
+  9   581   June\ 29
+  10   743   July\ 2
+  11   731   July\ 3
+  12   736   July\ 4
+  13   691   July\ 5
+  14   626   July\ 6
+  15   788   July\ 9
+  16   667   July\ 10
+  17   737   July\ 11
+  18   678   July\ 12
+  19   560   July\ 13
+\end{filecontents*}
+%%%>
+\begin{comment}
+:Title: Group plot
+:Tags: 2D;Group plots;PGFPlotstable
+:Author: Elke Schubert
+:Slug: group-plot
+
+A group plot example.
+\end{comment}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.8}
+\usepackage{pgfplotstable}
+\usepgfplotslibrary{groupplots}
+\begin{document}
+\begin{tikzpicture}
+  % Read the file
+  % if needed, define column separators by pgfplotstableread[col sep=...]{}{}
+ \pgfplotstableread{data.csv}{\Data}
+ \begin{groupplot}[
+     group style = {group size = 2 by 1},
+     height = 10cm,
+     width = 10cm,
+     ymin = 500,
+     xticklabels from table = {\Data}{Day}, xtick = {1,...,19},
+     xticklabel style = {rotate = 90, xshift = -0.8ex, anchor = mid east}
+    ]
+    \nextgroupplot[xmin = 1, xmax = 19, ymax = 900]
+      \addplot[very thick] table [x = Number, y = Orders] {\Data};
+      \draw[red, dashed, thick] (axis cs:11,0) rectangle (axis cs:32,850);
+    \nextgroupplot[xmin = 11, xmax = 19, ymax = 850, width = 5cm]
+      \addplot[very thick] table [x = Number, y = Orders] {\Data};
+  \end{groupplot}
+  \draw[thick, blue, ->, shorten >=2pt, shorten <=2pt] (group c1r1.east)
+  -- (group c2r1.west);
+\end{tikzpicture}
+\end{document}

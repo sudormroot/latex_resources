@@ -1,0 +1,76 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+\usepackage{filecontents}
+\begin{filecontents}{data.dat}
+3.045784        3.415896
+3.405784        4.025693
+3.785784        4.522530
+4.125784        5.538449
+4.485784        6.704992
+4.805784        6.978939
+5.145784        7.113496
+5.425784        8.916397
+6.065784        9.487712
+6.365784        10.876397
+6.685784        10.693497
+7.025784        11.364131
+7.345784        11.442530
+7.665784        12.582530
+8.005784        13.125693
+8.225784        13.738450
+8.585784        14.247891
+8.865784        14.982530
+\end{filecontents}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.6}
+\begin{comment}
+:Title: Mathematica 9 style plots
+:Tags: 2D;ycomb
+:Author: Jake
+:Slug: mathematica-9-style
+
+Here's a way of doing Mathematica 9 style plots with PGFPlots: the first plot
+is simply a ycomb plot, and the second we can draw using separate plots for the
+areas (with a trailing \closedcycle to get the filling right) and the lines.
+
+This code was written by Jake on TeX.SE.
+\end{comment}
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+    ymin=0,
+    xtick=\empty,
+    ytick=\empty,
+    axis background/.style={fill=gray!10},
+  ]
+  \addplot [ycomb, red, very thick, mark=*, mark options={red!60!black}] table {data.dat};
+  \end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \begin{axis}[
+    ymin=0,
+    xtick=\empty,
+    ytick=\empty,
+    axis background/.style={fill=gray!10},
+    enlarge x limits=false
+  ]
+  \addplot [draw=none, fill=orange!40!yellow] table {data.dat} \closedcycle;
+  \addplot [draw=gray, very thick] table {data.dat};
+
+  \addplot [draw=none, fill=red!60] table [
+    x expr=\thisrowno{0}+8.865784-3.045784,
+    y expr=\thisrowno{1}+14.982530-3.415896
+  ] {data.dat} \closedcycle;
+  \addplot [draw=red!70!black, very thick] table [
+    x expr=\thisrowno{0}+8.865784-3.045784,
+    y expr=\thisrowno{1}+14.982530-3.415896
+  ] {data.dat};
+    \draw node[append after command={ (a) -| (axis cs:10.5,13.5)}, font=\sffamily]
+    (a) at (axis cs:6,16) {Forecast};
+\end{axis}
+\end{tikzpicture}
+\end{document}

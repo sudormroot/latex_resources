@@ -1,0 +1,26 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.10}
+\begin{comment}
+:Title: Smooth plot
+:Tags: 2D;Linear plots;Manual
+:Author: Christian Feuersänger
+:Slug: linear-plot
+
+Constant plots draw lines parallel to the x-axis to connect coordinates. The
+discontinuous edges may be drawn or not, and marks may be placed on left or
+right ends.
+
+The code is from the PGFPlots 1.10 manual: "4.5.1 Linear Plots".
+\end{comment}
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}
+    \addplot+[sharp plot] coordinates
+      {(0,0) (1,2) (2,3)};
+  \end{axis}
+\end{tikzpicture}
+\end{document}

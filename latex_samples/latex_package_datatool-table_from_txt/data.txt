@@ -1,0 +1,12 @@
+Distribution,Hits
+Mint,2364
+Ubuntu,1838
+Debian,1582
+openSUSE,1334
+Fedora,1262
+Mageia,1219
+CentOS,1171
+Arch,1040
+elementary,899
+Zorin,85
+

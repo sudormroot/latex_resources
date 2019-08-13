@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{datatool}
+\DTLloaddb{Myfile}{data.txt}
+\DTLsort[Distribution]{Hits=descending}{Myfile}
+\pagestyle{empty}
+\begin{document}
+\begin{tabular}{rlr}
+   & Distribution & Hits \\
+   \cmidrule(lr){2-2}\cmidrule(lr){3-3}
+   \DTLforeach{Myfile}{%
+   \distribution=Distribution,\hits=Hits}{%
+     \theDTLrowi & \distribution & \hits \\}
+\end{tabular}
+\end{document}

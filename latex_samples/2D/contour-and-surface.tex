@@ -1,0 +1,91 @@
+\documentclass[border=10pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.8}
+\begin{comment}
+:Title: Combining surface and contour plots
+:Tags: 2D;3D;Surface plots;Contour plots;GNUplot;Mathematics
+:Author: Christian Feuersaenger
+:Slug: contour-and-surface
+
+Here we show how contour plots and 3D surface plots can be combined.
+
+Pgfplots can compute the z contours by means of gnuplot and its contour
+gnuplot interface.
+
+The projection onto the x axis (i.e. with fixed y) can be done by means of a
+matrix line plot in which you replace the y coordinate of the input matrix
+by some fixed constant.
+
+The projection onto the y axis (i.e. with fixed x) is more involved (at least
+if mesh/ordering=x varies as in my example below) because one needs to
+transpose the input matrix. In my example below, I simply replaced the
+meaning of x and y to achieve the transposal. This, of course, would be more
+involved for a data matrix (and I think that pgfplots has no builtin to do it).
+
+The first contour is the z contour. It is computed using GNUPLOT and that's
+why it requires the -shell-escape option. You can find information about this
+requirement already on http://pgfplots.net/tikz/examples/contour-surface/ .
+
+The x and y projections are computed using the same matrix of function values.
+I chose a different sampling density to control how many "contour lines" shall
+be drawn. Note that these lines are conceptionally different from the z
+contours: they are already part of the sampling procedure and do not need to
+be computed externally. Note that I used mesh, patch type=line to tell pgfplots
+that
+
+ - it should use individually colored segments and
+ - it should not color the 2d structure, just the lines in scanline order
+   (which is mesh/ordering=x varies in my case).
+
+This example was written by Christian Feuersaenger on TeX.SE.
+\end{comment}
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+    domain=-2:2,
+    domain y=0:2*pi,
+  ]
+
+    \newcommand\expr[2]{exp(-#1^2) * sin(deg(#2))}
+
+    \addplot3[
+        contour gnuplot={
+            % cdata should not be affected by z filter:
+            output point meta=rawz,
+            number=10,
+            labels=false,
+        },
+        samples=41,
+        z filter/.code=\def\pgfmathresult{-1.6},
+    ]
+        {\expr{x}{y}};
+
+    \addplot3[
+        samples=41,
+        samples y=10,
+        domain=0:2*pi,
+        domain y=-2:2,
+        % we want 1d (!) individually colored mesh segments:
+        mesh, patch type=line,
+        x filter/.code=\def\pgfmathresult{-2.5},
+    ] 
+        (y,x,{\expr{y}{x}});
+
+    \addplot3[
+        samples=41,
+        samples y=10,
+        % we want 1d (!) individually colored mesh segments:
+        mesh, patch type=line,
+        y filter/.code=\def\pgfmathresult{8},
+    ] 
+        {\expr{x}{y}};
+
+    \addplot3[surf,samples=25]
+        {\expr{x}{y}};
+
+\end{axis}
+\end{tikzpicture}
+\end{document}

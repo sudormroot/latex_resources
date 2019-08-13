@@ -1,0 +1,43 @@
+\documentclass[border=5pt]{standalone}
+%%%<
+\usepackage{verbatim}
+%%%>
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.8}
+\begin{comment}
+:Title: Streamline data
+:Tags: 2D;
+:Author: Paul Gessler
+:Slug: streamline-data
+
+I enjoy the simplicity of the code and the quality of the result. It uses
+pgfplots to display streamline data for vortex shedding from a square block
+at Re=100. The streamline data were computed by a Fortran code I wrote to
+model the flow.
+
+The data files are quite large; they are available here for anyone wishing
+to reproduce my result. The full paper is available for download on:
+https://dl.dropboxusercontent.com/u/10724484/TeX.SX/StreamlineData.zip
+It includes many similar figures showing different times during the vortex
+shedding process.
+
+Paul Gessler on TeX.SE
+\end{comment}
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+  axis equal image,
+  xmin=13,xmax=35,
+  ymin=0,ymax=3,
+  width=7in,
+  xlabel={$x/D$ (-)},
+  ylabel={$y/D$ (-)},
+]
+  \foreach \num in {1,2,...,18} {
+    \addplot[black] file {time43.39stream\num.dat};                          
+  }
+  \draw[fill=black] (axis cs:15,1) rectangle (axis cs:16,2);
+\end{axis}
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,45 @@
+\documentclass{article}
+
+\usepackage{pgf}
+
+%\usepackage[T1]{fontenc}
+
+%\usepackage[english]{babel}
+\usepackage{fp,xstring}
+\usepackage[autolanguage]{numprint}
+
+\begin{document}
+
+\newcommand{\varA}{87}
+\newcommand{\varB}{17}
+
+\noindent
+Simple demon use pgf package \\
+\varA \ divided by \varB \ is approximately \pgfmathparse{int(round(\varA / \varB))}\pgfmathresult.
+\noindent
+the result is \pgfmathresult
+
+\newcommand{\varC}{\pgfmathresult}
+\noindent
+the varC is \varC
+
+\newcommand{\varD}{99}
+\newcommand{\varE}{7}
+\noindent
+\varD \ divided by \varE \ is approximately \pgfmathparse{int(round(\varD / \varE))}\pgfmathresult.
+\noindent
+the varC is \varC
+
+
+----------
+\noindent
+Simple demo using fp package
+
+\def\mynumber{120,000.00}
+\def\mydiv{17}
+$\mynumber/\mydiv= %
+\StrDel\mynumber,[\mynumber] %
+\FPeval\myresult{round(\mynumber/\mydiv,0)} %
+\numprint\myresult$
+
+\end{document}
